@@ -14,6 +14,7 @@
             scope.selectedDeliveryMethodName = null;
             scope.twofactorRememberMe = false;
 
+
             scope.login = function () {
                 scope.authenticationFailed = false;
                 scope.load = true;
@@ -24,7 +25,7 @@
             scope.$on("UserAuthenticationFailureEvent", function (event, data, status) {
                 delete scope.loginCredentials.password;
                 scope.authenticationFailed = true;
-                if(status != 401) {
+                if(status !== 401) {
                     scope.authenticationErrorMessage = 'error.connection.failed';
                     scope.load = false;
                 } else {

@@ -7,7 +7,7 @@
 
             var onLoginSuccess = function (response) {
                 var data = response.data;
-                if(data.isTwoFactorAuthenticationRequired != null && data.isTwoFactorAuthenticationRequired == true) {
+                if(data.isTwoFactorAuthenticationRequired != null && data.isTwoFactorAuthenticationRequired === true) {
                     if(hasValidTwoFactorToken(data.username)) {
                         var token = getTokenFromStorage(data.username);
                         onTwoFactorRememberMe(data, token);
@@ -65,6 +65,7 @@
 
             this.authenticateWithUsernamePassword = function (credentials) {
                 scope.$broadcast("UserAuthenticationStartEvent");
+                httpService.setTenantIdentifier(credentials.tenantIdentifier);
         		if(SECURITY === 'oauth'){
 	                httpService.post( "/fineract-provider/api/oauth/token?username=" + credentials.username + "&password=" + credentials.password +"&client_id=community-app&grant_type=password&client_secret=123")
                     .then(getUserDetails)
