@@ -614,7 +614,7 @@
                 if (reportParams > "") reportURL += "&" + reportParams;
 
                 // allow untrusted urls for iframe http://docs.angularjs.org/error/$sce/insecurl
-                
+
                 reportURL = $sce.trustAsResourceUrl(reportURL);
                 reportURL = $sce.valueOf(reportURL);
                 http.get(reportURL, {responseType: 'arraybuffer'})
