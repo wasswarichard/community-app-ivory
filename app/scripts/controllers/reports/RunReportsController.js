@@ -398,7 +398,7 @@
             };
         }
     });
-    mifosX.ng.application.controller('RunReportsController', ['$scope', '$routeParams', 'ResourceFactory', '$location', 'dateFilter', '$http', 'API_VERSION', '$rootScope', '$sce', '$log', mifosX.controllers.RunReportsController]).run(function ($log) {
+    mifosX.ng.application.controller('RunReportsController', ['$scope', '$routeParams', 'ResourceFactory', '$location', 'dateFilter', '$http', 'API_VERSION', '$rootScope', '$sce', '$log','$log', mifosX.controllers.RunReportsController]).run(function ($log) {
         $log.info("RunReportsController initialized");
     });
 }(mifosX.controllers || {}));

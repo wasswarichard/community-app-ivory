@@ -1,6 +1,6 @@
 (function (module) {
     mifosX.controllers = _.extend(module, {
-        ViewLoanDetailsController: function (scope, routeParams, resourceFactory,paginatorService, location, route, http, $uibModal, dateFilter, API_VERSION, $sce, $rootScope) {
+        ViewLoanDetailsController: function (scope, routeParams, resourceFactory,paginatorService, location, route, http, $uibModal, dateFilter, API_VERSION, $sce, $rootScope, $log) {
             scope.loandocuments = [];
             scope.report = false;
             scope.hidePentahoReport = true;
@@ -602,19 +602,39 @@
                 scope.viewTransactionReport = true;
                 scope.viewLoanReport = false;
                 scope.viewReport = true;
-                scope.hidePentahoReport = true;
+                scope.hidePentahoReport = false;
                 scope.formData.outputType = 'PDF';
-                scope.baseURL = $rootScope.hostUrl + API_VERSION + "/runreports/" + encodeURIComponent("Loan Transaction Receipt");
-                scope.baseURL += "?output-type=" + encodeURIComponent(scope.formData.outputType) + "&tenantIdentifier=" + $rootScope.tenantIdentifier+"&locale="+scope.optlang.code;
+
+                var reportURL = $rootScope.hostUrl + API_VERSION + "/runreports/" + encodeURIComponent("Loan Transaction Receipt");
+                reportURL += "?output-type=" + encodeURIComponent(scope.formData.outputType) + "&tenantIdentifier=" + $rootScope.tenantIdentifier+"&locale="+scope.optlang.code+ '&dateFormat=' + scope.df;
 
                 var reportParams = "";
                 var paramName = "R_transactionId";
                 reportParams += encodeURIComponent(paramName) + "=" + encodeURIComponent(transactionId);
-                if (reportParams > "") {
-                    scope.baseURL += "&" + reportParams;
-                }
+                if (reportParams > "") reportURL += "&" + reportParams;
+
                 // allow untrusted urls for iframe http://docs.angularjs.org/error/$sce/insecurl
-                scope.viewReportDetails = $sce.trustAsResourceUrl(scope.baseURL);
+                
+                reportURL = $sce.trustAsResourceUrl(reportURL);
+                reportURL = $sce.valueOf(reportURL);
+                http.get(reportURL, {responseType: 'arraybuffer'})
+                    .then(function(response) {
+                        let data = response.data;
+                        let status = response.status;
+                        let headers = response.headers;
+                        let config = response.config;
+                        var contentType = headers('Content-Type');
+                        var file = new Blob([data], {type: contentType});
+                        var fileContent = URL.createObjectURL(file);
+
+                        // Pass the form data to the iframe as a data url.
+                        scope.baseURL = $sce.trustAsResourceUrl(fileContent);
+                        scope.viewReportDetails = $sce.trustAsResourceUrl(fileContent);
+                    })
+                    .catch(function(error){
+                        $log.error(`Error loading ${scope.reportType} report`);
+                        $log.error(error);
+                    });
 
             };
             scope.viewloantransactionjournalentries = function(transactionId){
@@ -732,7 +752,7 @@
             };
         }
     });
-    mifosX.ng.application.controller('ViewLoanDetailsController', ['$scope', '$routeParams', 'ResourceFactory','PaginatorService', '$location', '$route', '$http', '$uibModal', 'dateFilter', 'API_VERSION', '$sce', '$rootScope', mifosX.controllers.ViewLoanDetailsController]).run(function ($log) {
+    mifosX.ng.application.controller('ViewLoanDetailsController', ['$scope', '$routeParams', 'ResourceFactory','PaginatorService', '$location', '$route', '$http', '$uibModal', 'dateFilter', 'API_VERSION', '$sce', '$rootScope', '$log', mifosX.controllers.ViewLoanDetailsController]).run(function ($log) {
         $log.info("ViewLoanDetailsController initialized");
     });
 }(mifosX.controllers || {}));
