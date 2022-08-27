@@ -929,26 +929,21 @@
 
             var ViewLargerClientSignature = function($scope,$uibModalInstance){
                 var loadSignature = function(){
-                    http({
-                        method: 'GET',
-                        url: $rootScope.hostUrl + API_VERSION + '/clients/' + routeParams.id + '/documents'
-                    }).then(function (docsData) {
-                        $scope.docId = -1;
+                    const url = $rootScope.hostUrl + API_VERSION + '/clients/' + routeParams.id + '/documents';
+                    http.get(url).then(function (docsData) {
                         for (var i = 0; i < docsData.data.length; ++i) {
-                            if (docsData.data[i].name == 'clientSignature') {
+                            if (docsData.data[i].name === 'clientSignature') {
                                 $scope.docId = docsData.data[i].id;
                                 scope.signature_url = $rootScope.hostUrl + API_VERSION + '/clients/' + routeParams.id + '/documents/' + $scope.docId + '/attachment?tenantIdentifier=' + $rootScope.tenantIdentifier;
                             }
                         }
                         if (scope.signature_url != null) {
-                            http({
-                                method: 'GET',
-                                url: $rootScope.hostUrl + API_VERSION + '/clients/' + routeParams.id + '/documents/' + $scope.docId + '/attachment?tenantIdentifier=' + $rootScope.tenantIdentifier
-                            }).then(function (docsData) {
+                            const dataUrl =  $rootScope.hostUrl + API_VERSION + '/clients/' + routeParams.id + '/documents/' + $scope.docId + '/attachment?tenantIdentifier=' + $rootScope.tenantIdentifier;
+                            http.get(dataUrl).then(function (docsData) {
                                 $scope.largeImage = scope.signature_url;
-                            });
+                            })
                         }
-                    });
+                    })
                 };
                 loadSignature();
                 $scope.deleteSig = function () {
